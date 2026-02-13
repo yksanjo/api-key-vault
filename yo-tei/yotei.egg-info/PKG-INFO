@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: yotei
+Version: 0.1.0
+Summary: Yo-tei (予定) - Agent-to-Agent Social Planning CLI
+Author: Yoshi Kondo
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10

@@ -1,0 +1,23 @@
+# CLI Framework
+typer[all]>=0.9.0
+rich>=13.0.0
+
+# API & Async
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+websockets>=12.0
+httpx>=0.26.0
+
+# Data & Validation
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# Database
+aiosqlite>=0.19.0
+
+# Utilities
+python-dateutil>=2.8.2
+shortuuid>=1.0.11
+
+# Optional: Stripe for subscriptions
+stripe>=7.0.0

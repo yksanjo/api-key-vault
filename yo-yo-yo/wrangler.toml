@@ -1,0 +1,11 @@
+name = "kimiclaw987"
+main = "src/index.js"
+compatibility_date = "2026-02-08"
+
+[[durable_objects.bindings]]
+name = "SANDBOX"
+class_name = "Sandbox"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Sandbox"]
