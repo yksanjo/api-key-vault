@@ -1,0 +1,1978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeCraft - Interactive Coding Tutor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=JetBrains+Mono:wght@600;700&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0D1117;
+            --bg-secondary: #161B22;
+            --bg-tertiary: #21262D;
+            --accent-primary: #58A6FF;
+            --accent-secondary: #7EE787;
+            --accent-warning: #F0883E;
+            --accent-error: #F85149;
+            --text-primary: #E6EDF3;
+            --text-secondary: #8B949E;
+            --text-muted: #484F58;
+            --border: #30363D;
+            --font-heading: 'JetBrains Mono', monospace;
+            --font-body: 'Source Sans 3', sans-serif;
+            --font-code: 'Fira Code', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            height: 60px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: var(--bg-primary);
+        }
+
+        .header-stats {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-item .icon {
+            font-size: 1.1rem;
+        }
+
+        .stat-item .value {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .streak-flame {
+            color: var(--accent-warning);
+            animation: flicker 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes flicker {
+            from { opacity: 0.8; transform: scale(1); }
+            to { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            margin-top: 60px;
+            height: calc(100vh - 130px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-280px);
+            position: absolute;
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            font-family: var(--font-heading);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .topic {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .topic-header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .topic-header:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .topic-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .topic-icon {
+            font-size: 1.2rem;
+        }
+
+        .topic-progress {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .topic-lessons {
+            display: none;
+            padding: 8px 16px 16px;
+        }
+
+        .topic.open .topic-lessons {
+            display: block;
+        }
+
+        .lesson-item {
+            padding: 10px 12px;
+            margin: 4px 0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .lesson-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .lesson-item.active {
+            background: rgba(88, 166, 255, 0.15);
+            color: var(--accent-primary);
+        }
+
+        .lesson-item.completed {
+            color: var(--accent-secondary);
+        }
+
+        .lesson-item.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .lesson-status {
+            font-size: 0.75rem;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .content-panels {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* Concept Panel */
+        .concept-panel {
+            width: 40%;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .concept-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .concept-card:hover {
+            box-shadow: 0 0 20px rgba(88, 166, 255, 0.1);
+        }
+
+        .concept-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .concept-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .concept-title {
+            font-family: var(--font-heading);
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .concept-text {
+            line-height: 1.7;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .concept-text p {
+            margin-bottom: 12px;
+        }
+
+        .concept-text code {
+            font-family: var(--font-code);
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--accent-primary);
+        }
+
+        .code-block {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            font-family: var(--font-code);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .code-block .keyword { color: #FF7B72; }
+        .code-block .string { color: #A5D6FF; }
+        .code-block .number { color: #79C0FF; }
+        .code-block .function { color: #D2A8FF; }
+        .code-block .comment { color: var(--text-muted); font-style: italic; }
+
+        .key-points {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .key-points-title {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--accent-warning);
+        }
+
+        .key-points ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .key-points li {
+            padding: 6px 0;
+            padding-left: 20px;
+            position: relative;
+            color: var(--text-secondary);
+        }
+
+        .key-points li::before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: var(--accent-secondary);
+        }
+
+        /* Editor Panel */
+        .editor-panel {
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            padding: 16px;
+        }
+
+        .editor-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .editor-title {
+            font-family: var(--font-heading);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .editor-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .code-editor {
+            flex: 1;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            overflow: hidden;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .line-numbers {
+            background: var(--bg-secondary);
+            padding: 16px 12px;
+            text-align: right;
+            font-family: var(--font-code);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            user-select: none;
+            min-width: 48px;
+        }
+
+        .code-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 16px;
+            font-family: var(--font-code);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+        }
+
+        /* Output Console */
+        .output-console {
+            height: 180px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .console-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .console-title {
+            font-family: var(--font-heading);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .console-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .console-output {
+            flex: 1;
+            padding: 12px 16px;
+            font-family: var(--font-code);
+            font-size: 0.85rem;
+            overflow-y: auto;
+            color: var(--text-secondary);
+        }
+
+        .console-line {
+            margin-bottom: 4px;
+        }
+
+        .console-line.error {
+            color: var(--accent-error);
+        }
+
+        .console-line.success {
+            color: var(--accent-secondary);
+        }
+
+        .console-line.info {
+            color: var(--accent-primary);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            height: 70px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .progress-dots {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .progress-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .progress-dot.active {
+            background: var(--accent-primary);
+            transform: scale(1.2);
+        }
+
+        .progress-dot.completed {
+            background: var(--accent-secondary);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: scale(1.02);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover {
+            background: #79B8FF;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-success {
+            background: var(--accent-secondary);
+            color: var(--bg-primary);
+        }
+
+        .btn-warning {
+            background: var(--accent-warning);
+            color: var(--bg-primary);
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.8rem;
+        }
+
+        /* Feedback Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 480px;
+            width: 90%;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.show .modal {
+            transform: translateY(0);
+        }
+
+        .modal-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 20px;
+        }
+
+        .modal-icon.success {
+            background: rgba(126, 231, 135, 0.15);
+            color: var(--accent-secondary);
+        }
+
+        .modal-icon.error {
+            background: rgba(248, 81, 73, 0.15);
+            color: var(--accent-error);
+        }
+
+        .modal-title {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .modal-text {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .modal-explanation {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        .modal-explanation-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--accent-warning);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 24px;
+            z-index: 1001;
+        }
+
+        .toast {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-icon {
+            font-size: 1.5rem;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .toast-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 999;
+            overflow: hidden;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            top: -20px;
+            animation: confetti-fall 3s ease-out forwards;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .content-panels {
+                flex-direction: column;
+            }
+
+            .concept-panel,
+            .editor-panel {
+                width: 100%;
+            }
+
+            .concept-panel {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                max-height: 40vh;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 60px;
+                bottom: 70px;
+                z-index: 99;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .header-stats {
+                gap: 12px;
+            }
+
+            .stat-item .label {
+                display: none;
+            }
+
+            .bottom-nav {
+                padding: 0 12px;
+            }
+
+            .nav-buttons {
+                gap: 8px;
+            }
+
+            .btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+
+            .progress-dots {
+                display: none;
+            }
+        }
+
+        /* Mobile tabs */
+        .mobile-tabs {
+            display: none;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+        }
+
+        @media (max-width: 768px) {
+            .mobile-tabs {
+                display: flex;
+            }
+
+            .mobile-tab {
+                flex: 1;
+                padding: 12px;
+                text-align: center;
+                font-weight: 600;
+                color: var(--text-secondary);
+                border-bottom: 2px solid transparent;
+                cursor: pointer;
+            }
+
+            .mobile-tab.active {
+                color: var(--accent-primary);
+                border-bottom-color: var(--accent-primary);
+            }
+        }
+
+        /* Progress bar animation */
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        /* Hint highlight */
+        .hint-text {
+            background: rgba(240, 136, 62, 0.1);
+            border-left: 3px solid var(--accent-warning);
+            padding: 12px 16px;
+            margin: 12px 0;
+            color: var(--accent-warning);
+            display: none;
+        }
+
+        .hint-text.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Level badge */
+        .level-badge {
+            background: linear-gradient(135deg, var(--accent-primary), #A371F7);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <div class="logo-icon"></></div>
+            <span>CodeCraft</span>
+        </div>
+        <div class="header-stats">
+            <div class="stat-item">
+                <span class="icon">⭐</span>
+                <span class="label">Level</span>
+                <span class="value" id="level-display">1</span>
+            </div>
+            <div class="stat-item">
+                <span class="icon">💎</span>
+                <span class="label">XP</span>
+                <span class="value" id="xp-display">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="icon streak-flame">🔥</span>
+                <span class="label">Streak</span>
+                <span class="value" id="streak-display">0</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">📚 Topics</div>
+            <div id="topics-list"></div>
+        </aside>
+
+        <!-- Content Area -->
+        <main class="content-area">
+            <!-- Mobile Tabs -->
+            <div class="mobile-tabs">
+                <div class="mobile-tab active" data-tab="learn">Learn</div>
+                <div class="mobile-tab" data-tab="code">Code</div>
+            </div>
+
+            <div class="content-panels">
+                <!-- Concept Panel -->
+                <div class="concept-panel" id="concept-panel">
+                    <div class="concept-card">
+                        <div class="concept-header">
+                            <div class="concept-icon" id="concept-icon">📖</div>
+                            <h2 class="concept-title" id="concept-title">Loading...</h2>
+                        </div>
+                        <div class="concept-text" id="concept-text"></div>
+                        <div class="hint-text" id="hint-text"></div>
+                        <div class="key-points" id="key-points"></div>
+                    </div>
+                </div>
+
+                <!-- Editor Panel -->
+                <div class="editor-panel">
+                    <div class="editor-container">
+                        <div class="editor-header">
+                            <span class="editor-title">JavaScript Editor</span>
+                            <div class="editor-actions">
+                                <button class="btn btn-secondary btn-small" id="btn-run">▶ Run</button>
+                            </div>
+                        </div>
+                        <div class="code-editor">
+                            <div class="line-numbers" id="line-numbers">1</div>
+                            <textarea class="code-input" id="code-input" spellcheck="false" placeholder="// Write your code here..."></textarea>
+                        </div>
+                    </div>
+                    <div class="output-console">
+                        <div class="console-header">
+                            <span class="console-title">Output</span>
+                            <div class="console-actions">
+                                <button class="btn btn-secondary btn-small" id="btn-clear">Clear</button>
+                            </div>
+                        </div>
+                        <div class="console-output" id="console-output">
+                            <div class="console-line">// Output will appear here...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-buttons">
+            <button class="btn btn-secondary" id="btn-prev">← Previous</button>
+            <button class="btn btn-warning btn-small" id="btn-hint">💡 Hint</button>
+        </div>
+        <div class="progress-dots" id="progress-dots"></div>
+        <div class="nav-buttons">
+            <button class="btn btn-primary" id="btn-submit">Submit ✓</button>
+            <button class="btn btn-success" id="btn-next">Next →</button>
+        </div>
+    </nav>
+
+    <!-- Feedback Modal -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <div class="modal-icon" id="modal-icon">✓</div>
+            <h3 class="modal-title" id="modal-title">Correct!</h3>
+            <p class="modal-text" id="modal-text">Great job completing this lesson!</p>
+            <div class="modal-explanation" id="modal-explanation"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" id="btn-practice">Practice More</button>
+                <button class="btn btn-primary" id="btn-continue">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Confetti Container -->
+    <div class="confetti" id="confetti"></div>
+
+    <script>
+        // ============================================
+        // Data: Lessons and Topics
+        // ============================================
+        const TOPICS = [
+            {
+                id: 'variables',
+                name: 'Variables',
+                icon: '📦',
+                lessons: [
+                    {
+                        id: 'variables-1',
+                        title: 'What are Variables?',
+                        content: `<p>Variables are containers for storing data values. Think of them as labeled boxes where you can put information.</p>
+                        <p>In JavaScript, we declare variables using <code>let</code>, <code>const</code>, or <code>var</code>.</p>`,
+                        codeExample: `<span class="keyword">let</span> <span class="string">message</span> = <span class="string">"Hello, World!"</span>;
+<span class="keyword">const</span> <span class="number">age</span> = <span class="number">25</span>;
+<span class="keyword">var</span> <span class="string">name</span> = <span class="string">"Alice"</span>;`,
+                        keyPoints: ['Variables store data values', 'let for values that change', 'const for values that stay the same', 'var is the old way (avoid)'],
+                        starterCode: `// Create a variable called "greeting" with the value "Hello!"
+// Create a variable called "count" with the value 10
+
+// Print both variables
+console.log(greeting);
+console.log(count);`,
+                        solution: `let greeting = "Hello!";
+let count = 10;
+console.log(greeting);
+console.log(count);`,
+                        hints: ['Use let to create a variable: let variableName = value;', 'Remember to put string values in quotes!', 'You can print variables using console.log()'],
+                        testCases: [
+                            { code: 'typeof greeting', expected: 'string' },
+                            { code: 'typeof count', expected: 'number' }
+                        ]
+                    },
+                    {
+                        id: 'variables-2',
+                        title: 'Naming Variables',
+                        content: `<p>Good variable names make your code readable and maintainable. Follow these rules:</p>
+                        <p>Variable names can contain letters, numbers, underscores, and dollar signs. They cannot start with a number.</p>`,
+                        codeExample: `<span class="keyword">let</span> <span class="string">userName</span>;      <span class="comment">// camelCase ✓</span>
+<span class="keyword">let</span> <span class="string">user_age</span>;     <span class="comment">// snake_case ✓</span>
+<span class="keyword">let</span> <span class="string">_private</span>;     <span class="comment">// starts with underscore ✓</span>
+<span class="keyword">let</span> <span class="string">$element</span>;      <span class="comment">// starts with $ ✓</span>
+<span class="keyword">let</span> <span class="string">2fast</span>;         <span class="comment">// starts with number ✗</span>`,
+                        keyPoints: ['Use camelCase for multi-word names', 'Names are case-sensitive', 'Avoid reserved words', 'Be descriptive but concise'],
+                        starterCode: `// Fix these variable names:
+// 1. let first name = "John";  (error!)
+// 2. let class = "Math";       (error!)
+// 3. let x = "City";           (not descriptive)
+
+// Create properly named variables:
+`,
+                        solution: `let firstName = "John";
+let className = "Math";
+let cityName = "City";`,
+                        hints: ['Replace spaces with camelCase', 'class is a reserved word, use className instead', 'Choose names that describe the value'],
+                        testCases: [
+                            { code: 'typeof firstName', expected: 'string' },
+                            { code: 'typeof className', expected: 'string' }
+                        ]
+                    },
+                    {
+                        id: 'variables-3',
+                        title: 'Updating Variables',
+                        content: `<p>Variables declared with <code>let</code> can be updated. You can change their value over time.</p>
+                        <p>You can also use the variable's current value to calculate a new one.</p>`,
+                        codeExample: `<span class="keyword">let</span> <span class="string">score</span> = <span class="number">0</span>;
+<span class="string">score</span> = <span class="number">10</span>;           <span class="comment">// Now score is 10</span>
+<span class="string">score</span> = <span class="string">score</span> + <span class="number">5</span>;  <span class="comment">// Now score is 15</span>
+
+<span class="comment">// Shorthand operators:</span>
+<span class="string">score</span> += <span class="number">5</span>;      <span class="comment">// score = score + 5</span>
+<span class="string">score</span>++;           <span class="comment">// increment by 1</span>`,
+                        keyPoints: ['let allows reassignment', 'Use +=, -=, *=, /= for math operations', '++ increments by 1', '-- decrements by 1'],
+                        starterCode: `let points = 10;
+
+// Add 5 more points
+// Double the points
+// Subtract 3
+// Print the final score
+console.log(points);`,
+                        solution: `let points = 10;
+points += 5;
+points *= 2;
+points -= 3;
+console.log(points);`,
+                        hints: ['Use += to add to the current value', 'Use *= to multiply', 'Each operation changes the value permanently'],
+                        testCases: [
+                            { code: 'points', expected: 24 }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'datatypes',
+                name: 'Data Types',
+                icon: '🔢',
+                lessons: [
+                    {
+                        id: 'datatypes-1',
+                        title: 'Primitive Types',
+                        content: `<p>JavaScript has several primitive data types. The main ones are:</p>
+                        <p><strong>String</strong> - Text in quotes<br>
+                        <strong>Number</strong> - Any number<br>
+                        <strong>Boolean</strong> - true or false<br>
+                        <strong>Undefined</strong> - No value assigned<br>
+                        <strong>Null</strong> - Intentional absence</p>`,
+                        codeExample: `<span class="keyword">let</span> <span class="string">name</span> = <span class="string">"Alice"</span>;    <span class="comment">// String</span>
+<span class="keyword">let</span> <span class="string">age</span> = <span class="number">25</span>;           <span class="comment">// Number</span>
+<span class="keyword">let</span> <span class="string">isStudent</span> = <span class="keyword">true</span>;   <span class="comment">// Boolean</span>
+<span class="keyword">let</span> <span class="string">job</span>;                 <span class="comment">// Undefined</span>
+<span class="keyword">let</span> <span class="string">empty</span> = <span class="keyword">null</span>;         <span class="comment">// Null</span>`,
+                        keyPoints: ['Strings use quotes (single or double)', 'Numbers can be integers or decimals', 'Boolean is only true or false', 'Use typeof to check the type'],
+                        starterCode: `// Create variables of different types:
+// - A string called "language" with value "JavaScript"
+// - A number called "year" with value 2024
+// - A boolean called "isAwesome" with value true
+
+// Use typeof to print each type
+console.log(typeof language);
+console.log(typeof year);
+console.log(typeof isAwesome);`,
+                        solution: `let language = "JavaScript";
+let year = 2024;
+let isAwesome = true;
+console.log(typeof language);
+console.log(typeof year);
+console.log(typeof isAwesome);`,
+                        hints: ['String values go in quotes', 'Booleans are just true or false (no quotes)', 'typeof shows the data type'],
+                        testCases: [
+                            { code: 'typeof language', expected: 'string' },
+                            { code: 'typeof year', expected: 'number' },
+                            { code: 'typeof isAwesome', expected: 'boolean' }
+                        ]
+                    },
+                    {
+                        id: 'datatypes-2',
+                        title: 'Working with Strings',
+                        content: `<p>Strings have many useful methods and properties. You can combine them, extract parts, and transform them.</p>`,
+                        codeExample: `<span class="keyword">let</span> <span class="string">text</span> = <span class="string">"Hello, World!"</span>;
+
+<span class="string">text</span>.<span class="function">length</span>;           <span class="comment">// 13</span>
+<span class="string">text</span>.<span class="function">toUpperCase</span>();  <span class="comment">// "HELLO, WORLD!"</span>
+<span class="string">text</span>.<span class="function">toLowerCase</span>();  <span class="comment">// "hello, world!"</span>
+<span class="string">text</span>.<span class="function">includes</span>(<span class="string">"World"</span>); <span class="comment">// true</span>
+<span class="string">text</span>.<span class="function">slice</span>(<span class="number">0</span>, <span class="number">5</span>);      <span class="comment">// "Hello"</span>`,
+                        keyPoints: ['.length returns character count', '.toUpperCase() and .toLowerCase() change case', '.includes() checks if substring exists', '.slice() extracts part of string'],
+                        starterCode: `let message = "JavaScript is fun!";
+
+// Make it uppercase and print
+// Check if it includes "Python" and print result
+// Get characters from position 0 to 10 and print
+`,
+                        solution: `let message = "JavaScript is fun!";
+console.log(message.toUpperCase());
+console.log(message.includes("Python"));
+console.log(message.slice(0, 10));`,
+                        hints: ['Use .toUpperCase() for uppercase', '.includes() returns true or false', '.slice(start, end) extracts characters'],
+                        testCases: [
+                            { code: 'message.includes("Python")', expected: false }
+                        ]
+                    },
+                    {
+                        id: 'datatypes-3',
+                        title: 'Template Literals',
+                        content: `<p>Template literals let you embed expressions in strings using backticks (\`\`) and \${expression} syntax.</p>`,
+                        codeExample: `<span class="keyword">let</span> <span class="string">name</span> = <span class="string">"Alice"</span>;
+<span class="keyword">let</span> <span class="string">age</span> = <span class="number">25</span>;
+
+<span class="comment">// Old way:</span>
+<span class="string">"My name is "</span> + <span class="string">name</span>;
+
+<span class="comment">// Template literal:</span>
+<span class="keyword">\`My name is \${name}\`</span>;
+<span class="keyword">\`I am \${age} years old\`</span>;`,
+                        keyPoints: ['Use backticks for template literals', '${} embeds variables and expressions', 'Multi-line strings are easy', 'More readable than string concatenation'],
+                        starterCode: `let product = "laptop";
+let price = 999;
+
+// Create a template literal that says:
+// "The laptop costs $999"
+// Include a calculation: price with 10% tax
+`,
+                        solution: `let product = "laptop";
+let price = 999;
+
+console.log(\`The \${product} costs $\${price}\`);
+console.log(\`Price with tax: $\${price * 1.1}\`);`,
+                        hints: ['Use backticks: `string`', 'Put expressions in ${}', 'You can do math inside ${}'],
+                        testCases: []
+                    }
+                ]
+            },
+            {
+                id: 'conditionals',
+                name: 'Conditionals',
+                icon: '🔀',
+                lessons: [
+                    {
+                        id: 'conditionals-1',
+                        title: 'If Statements',
+                        content: `<p>Conditionals let your code make decisions. The <code>if</code> statement runs code only when a condition is true.</p>`,
+                        codeExample: `<span class="keyword">let</span> <span class="string">age</span> = <span class="number">18</span>;
+
+<span class="keyword">if</span> (<span class="string">age</span> >= <span class="number">18</span>) {
+  console.log(<span class="string">"Adult"</span>);
+}
+
+<span class="comment">// With else:</span>
+<span class="keyword">if</span> (<span class="string">age</span> >= <span class="number">21</span>) {
+  console.log(<span class="string">"Can drink"</span>);
+} <span class="keyword">else</span> {
+  console.log(<span class="string">"Too young"</span>);
+}`,
+                        keyPoints: ['if (condition) runs when true', 'Use comparison operators: ===, !==, >, <, >=, <=', 'else runs when condition is false', 'Code inside {} is a block'],
+                        starterCode: `let temperature = 75;
+
+// If temperature is above 80, print "Hot!"
+// Else if above 60, print "Warm"
+// Else print "Cold"
+`,
+                        solution: `let temperature = 75;
+
+if (temperature > 80) {
+  console.log("Hot!");
+} else if (temperature > 60) {
+  console.log("Warm");
+} else {
+  console.log("Cold");
+}`,
+                        hints: ['Start with if (condition)', 'Use else if for more conditions', 'else handles all other cases'],
+                        testCases: []
+                    },
+                    {
+                        id: 'conditionals-2',
+                        title: 'Comparison Operators',
+                        content: `<p>JavaScript has several ways to compare values. Understanding the difference is important!</p>`,
+                        codeExample: `<span class="comment">// == checks value only</span>
+<span class="number">5</span> == <span class="string">"5"</span>;      <span class="comment">// true</span>
+
+<span class="comment">// === checks value AND type</span>
+<span class="number">5</span> === <span class="string">"5"</span>;     <span class="comment">// false</span>
+
+<span class="comment">// Other operators</span>
+<span class="number">5</span> !== <span class="number">3</span>;       <span class="comment">// true (not equal)</span>
+<span class="number">10</span> > <span class="number">5</span>;        <span class="comment">// true</span>
+<span class="number">3</span> <= <span class="number">3</span>;        <span class="comment">// true (less than or equal)</span>`,
+                        keyPoints: ['Always use === (strict equality)', '!= checks not equal (value)', '!== checks not equal (strict)', 'Use >, <, >=, <= for numbers'],
+                        starterCode: `// Compare these values using === and ==
+// and log the results
+
+let a = 10;
+let b = "10";
+
+console.log("a == b:", a == b);
+console.log("a === b:", a === b);
+console.log("a !== b:", a !== b);
+`,
+                        solution: `let a = 10;
+let b = "10";
+
+console.log("a == b:", a == b);
+console.log("a === b:", a === b);
+console.log("a !== b:", a !== b);`,
+                        hints: ['== ignores type', '=== considers type', '!== means "not equal strict"'],
+                        testCases: []
+                    },
+                    {
+                        id: 'conditionals-3',
+                        title: 'Logical Operators',
+                        content: `<p>Combine multiple conditions using logical operators: AND (&&), OR (||), NOT (!)</p>`,
+                        codeExample: `<span class="comment">// AND - both must be true</span>
+<span class="keyword">if</span> (<span class="string">age</span> >= <span class="number">18</span> && <span class="string">hasLicense</span>) {
+  console.log(<span class="string">"Can drive"</span>);
+}
+
+<span class="comment">// OR - at least one must be true</span>
+<span class="keyword">if</span> (<span class="string">isMember</span> || <span class="string">isVIP</span>) {
+  console.log(<span class="string">"Discount!"</span>);
+}
+
+<span class="comment">// NOT - inverts boolean</span>
+<span class="keyword">if</span> (!<span class="string">isClosed</span>) {
+  console.log(<span class="string">"Open for business"</span>);
+}`,
+                        keyPoints: ['&& returns true if both are true', '|| returns true if either is true', '! inverts true to false and vice versa', 'Can chain multiple conditions'],
+                        starterCode: `let age = 25;
+let hasID = true;
+let isBanned = false;
+
+// Check if person can enter:
+// - Must be 18 or older
+// - Must have ID
+// - Must not be banned
+
+if (age >= 18 && hasID && !isBanned) {
+  console.log("Can enter!");
+} else {
+  console.log("Cannot enter");
+}
+`,
+                        solution: `let age = 25;
+let hasID = true;
+let isBanned = false;
+
+if (age >= 18 && hasID && !isBanned) {
+  console.log("Can enter!");
+} else {
+  console.log("Cannot enter");
+}`,
+                        hints: ['Use && for AND logic', 'Use || for OR logic', 'Use ! to negate (NOT)'],
+                        testCases: []
+                    }
+                ]
+            },
+            {
+                id: 'loops',
+                name: 'Loops',
+                icon: '🔄',
+                lessons: [
+                    {
+                        id: 'loops-1',
+                        title: 'For Loops',
+                        content: `<p>Loops let you repeat code multiple times. The <code>for</code> loop is perfect when you know how many times to repeat.</p>`,
+                        codeExample: `<span class="comment">// for (start; condition; increment)</span>
+<span class="keyword">for</span> (<span class="keyword">let</span> <span class="string">i</span> = <span class="number">0</span>; <span class="string">i</span> < <span class="number">5</span>; <span class="string">i</span>++) {
+  console.log(<span class="string">i</span>);
+}
+<span class="comment">// Output: 0, 1, 2, 3, 4</span>
+
+<span class="comment">// Loop through array</span>
+<span class="keyword">let</span> <span class="string">fruits</span> = [<span class="string">"apple"</span>, <span class="string">"banana"</span>];
+<span class="keyword">for</span> (<span class="keyword">let</span> <span class="string">i</span> = <span class="number">0</span>; <span class="string">i</span> < <span class="string">fruits</span>.<span class="function">length</span>; <span class="string">i</span>++) {
+  console.log(<span class="string">fruits</span>[<span class="string">i</span>]);
+}`,
+                        keyPoints: ['i++ increments i by 1 each time', 'Loop runs while condition is true', 'Use fruits.length to loop through array', 'i starts at 0 (first index)'],
+                        starterCode: `// Use a for loop to print numbers 1 to 5
+// Then print each letter of "CODE" on separate lines
+
+for (let i = 1; i <= 5; i++) {
+  console.log(i);
+}
+`,
+                        solution: `for (let i = 1; i <= 5; i++) {
+  console.log(i);
+}
+
+let word = "CODE";
+for (let i = 0; i < word.length; i++) {
+  console.log(word[i]);
+}`,
+                        hints: ['Start at 0 for arrays', 'Use < length for all items', 'i++ is the same as i = i + 1'],
+                        testCases: []
+                    },
+                    {
+                        id: 'loops-2',
+                        title: 'While Loops',
+                        content: `<p>The <code>while</code> loop repeats as long as a condition is true. Be careful - it can loop forever!</p>`,
+                        codeExample: `<span class="keyword">let</span> <span class="string">count</span> = <span class="number">0</span>;
+
+<span class="keyword">while</span> (<span class="string">count</span> < <span class="number">3</span>) {
+  console.log(<span class="string">count</span>);
+  <span class="string">count</span>++;
+}
+
+<span class="comment">// Do-while runs at least once</span>
+<span class="keyword">let</span> <span class="string">i</span> = <span class="number">0</span>;
+<span class="keyword">do</span> {
+  console.log(<span class="string">i</span>);
+  <span class="string">i</span>++;
+} <span class="keyword">while</span> (<span class="string">i</span> < <span class="number">3</span>);`,
+                        keyPoints: ['while checks condition first', 'do-while runs once before checking', 'Always increment to avoid infinite loops', 'Use break to exit early'],
+                        starterCode: `// Use a while loop to count down from 5 to 1
+// Print "Liftoff!" after the loop
+
+let count = 5;
+while (count > 0) {
+  console.log(count);
+  count--;
+}
+console.log("Liftoff!");
+`,
+                        solution: `let count = 5;
+while (count > 0) {
+  console.log(count);
+  count--;
+}
+console.log("Liftoff!");`,
+                        hints: ['While means "repeat while true"', 'Decrement with count--', 'Check condition before each iteration'],
+                        testCases: []
+                    },
+                    {
+                        id: 'loops-3',
+                        title: 'For...of Loop',
+                        content: `<p>The <code>for...of</code> loop is a modern way to iterate over arrays and strings - simpler than traditional for loops!</p>`,
+                        codeExample: `<span class="keyword">let</span> <span class="string">colors</span> = [<span class="string">"red"</span>, <span class="string">"green"</span>, <span class="string">"blue"</span>];
+
+<span class="comment">// Get each item directly</span>
+<span class="keyword">for</span> (<span class="keyword">const</span> <span class="string">color</span> <span class="keyword">of</span> <span class="string">colors</span>) {
+  console.log(<span class="string">color</span>);
+}
+
+<span class="comment">// Works with strings too!</span>
+<span class="keyword">for</span> (<span class="keyword">const</span> <span class="string">letter</span> <span class="keyword">of</span> <span class="string">"Hi"</span>) {
+  console.log(<span class="string">letter</span>);
+}`,
+                        keyPoints: ['for...of gives you each item directly', 'No need to manage index manually', 'Works with any iterable', 'More readable than traditional for'],
+                        starterCode: `// Use for...of to print each fruit
+let fruits = ["apple", "banana", "cherry"];
+
+// Also use for...of to spell out "JS" character by character
+`,
+                        solution: `let fruits = ["apple", "banana", "cherry"];
+
+for (const fruit of fruits) {
+  console.log(fruit);
+}
+
+for (const char of "JS") {
+  console.log(char);
+}`,
+                        hints: ['for (item of array) gets each item', 'No index needed', 'Works great with strings'],
+                        testCases: []
+                    }
+                ]
+            }
+        ];
+
+        // ============================================
+        // Application State
+        // ============================================
+        let state = {
+            currentTopic: 'variables',
+            currentLesson: 0,
+            xp: 0,
+            level: 1,
+            streak: 0,
+            lastActiveDate: null,
+            completedLessons: {},
+            hintShown: false
+        };
+
+        // ============================================
+        // DOM Elements
+        // ============================================
+        const elements = {
+            levelDisplay: document.getElementById('level-display'),
+            xpDisplay: document.getElementById('xp-display'),
+            streakDisplay: document.getElementById('streak-display'),
+            topicsList: document.getElementById('topics-list'),
+            progressDots: document.getElementById('progress-dots'),
+            conceptIcon: document.getElementById('concept-icon'),
+            conceptTitle: document.getElementById('concept-title'),
+            conceptText: document.getElementById('concept-text'),
+            hintText: document.getElementById('hint-text'),
+            keyPoints: document.getElementById('key-points'),
+            codeInput: document.getElementById('code-input'),
+            lineNumbers: document.getElementById('line-numbers'),
+            consoleOutput: document.getElementById('console-output'),
+            modalOverlay: document.getElementById('modal-overlay'),
+            modalIcon: document.getElementById('modal-icon'),
+            modalTitle: document.getElementById('modal-title'),
+            modalText: document.getElementById('modal-text'),
+            modalExplanation: document.getElementById('modal-explanation'),
+            toastContainer: document.getElementById('toast-container'),
+            confetti: document.getElementById('confetti')
+        };
+
+        // ============================================
+        // Initialization
+        // ============================================
+        function init() {
+            loadState();
+            renderSidebar();
+            loadCurrentLesson();
+            updateProgressDots();
+            bindEvents();
+            checkStreak();
+        }
+
+        // ============================================
+        // State Management
+        // ============================================
+        function loadState() {
+            const saved = localStorage.getItem('codecraft_state');
+            if (saved) {
+                state = { ...state, ...JSON.parse(saved) };
+            }
+            updateStatsDisplay();
+        }
+
+        function saveState() {
+            localStorage.setItem('codecraft_state', JSON.stringify(state));
+        }
+
+        function updateStatsDisplay() {
+            elements.levelDisplay.textContent = state.level;
+            elements.xpDisplay.textContent = state.xp;
+            elements.streakDisplay.textContent = state.streak;
+        }
+
+        function checkStreak() {
+            const today = new Date().toDateString();
+            const lastActive = state.lastActiveDate;
+
+            if (lastActive) {
+                const lastDate = new Date(lastActive);
+                const todayDate = new Date(today);
+                const diffDays = Math.floor((todayDate - lastDate) / (1000 * 60 * 60 * 24));
+
+                if (diffDays > 1) {
+                    state.streak = 0;
+                    saveState();
+                }
+            }
+        }
+
+        function addXP(amount) {
+            state.xp += amount;
+            const newLevel = Math.floor(state.xp / 100) + 1;
+            if (newLevel > state.level) {
+                state.level = newLevel;
+                showToast('🎉', 'Level Up!', `You're now level ${state.level}!`);
+            }
+            updateStatsDisplay();
+            saveState();
+        }
+
+        function updateStreak() {
+            const today = new Date().toDateString();
+            if (state.lastActiveDate !== today) {
+                state.streak++;
+                state.lastActiveDate = today;
+                if (state.streak > 1) {
+                    showToast('🔥', 'Streak!', `${state.streak} days in a row!`);
+                }
+                saveState();
+            }
+        }
+
+        // ============================================
+        // Render Functions
+        // ============================================
+        function renderSidebar() {
+            let html = '';
+            TOPICS.forEach(topic => {
+                const completedCount = topic.lessons.filter(l => 
+                    state.completedLessons[l.id]
+                ).length;
+                const progress = Math.round((completedCount / topic.lessons.length) * 100);
+                const isOpen = topic.id === state.currentTopic;
+
+                html += `
+                    <div class="topic ${isOpen ? 'open' : ''}" data-topic="${topic.id}">
+                        <div class="topic-header">
+                            <div class="topic-title">
+                                <span class="topic-icon">${topic.icon}</span>
+                                <span>${topic.name}</span>
+                            </div>
+                            <span class="topic-progress">${progress}%</span>
+                        </div>
+                        <div class="topic-lessons">
+                            ${topic.lessons.map((lesson, idx) => {
+                                const isCompleted = state.completedLessons[lesson.id];
+                                const isActive = topic.id === state.currentTopic && idx === state.currentLesson;
+                                const isLocked = idx > 0 && !state.completedLessons[topic.lessons[idx - 1].id];
+
+                                return `
+                                    <div class="lesson-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''} ${isLocked ? 'locked' : ''}" 
+                                         data-topic="${topic.id}" 
+                                         data-lesson="${idx}"
+                                         ${isLocked ? 'style="pointer-events: none;"' : ''}>
+                                        <span>${lesson.title}</span>
+                                        <span class="lesson-status">${isCompleted ? '✓' : (idx + 1)}</span>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            elements.topicsList.innerHTML = html;
+        }
+
+        function loadCurrentLesson() {
+            const topic = TOPICS.find(t => t.id === state.currentTopic);
+            const lesson = topic.lessons[state.currentLesson];
+
+            if (!lesson) return;
+
+            elements.conceptIcon.textContent = topic.icon;
+            elements.conceptTitle.textContent = lesson.title;
+            elements.conceptText.innerHTML = `
+                ${lesson.content}
+                <div class="code-block"><pre>${lesson.codeExample}</pre></div>
+            `;
+
+            elements.keyPoints.innerHTML = `
+                <div class="key-points-title">Key Points</div>
+                <ul>
+                    ${lesson.keyPoints.map(point => `<li>${point}</li>`).join('')}
+                </ul>
+            `;
+
+            elements.codeInput.value = lesson.starterCode;
+            elements.hintText.classList.remove('show');
+            elements.hintText.innerHTML = '';
+            state.hintShown = false;
+
+            updateLineNumbers();
+            clearConsole();
+            console.log(`// Lesson: ${lesson.title}`);
+            console.log('// Click "Run" to test your code or "Submit" when ready.');
+        }
+
+        function updateLineNumbers() {
+            const lines = elements.codeInput.value.split('\n').length;
+            elements.lineNumbers.innerHTML = Array.from({ length: lines }, (_, i) => i + 1).join('<br>');
+        }
+
+        function updateProgressDots() {
+            const topic = TOPICS.find(t => t.id === state.currentTopic);
+            const total = topic.lessons.length;
+            
+            elements.progressDots.innerHTML = topic.lessons.map((_, idx) => {
+                const isCompleted = state.completedLessons[topic.lessons[idx].id];
+                const isActive = idx === state.currentLesson;
+                return `<div class="progress-dot ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}"></div>`;
+            }).join('');
+        }
+
+        // ============================================
+        // Event Handlers
+        // ============================================
+        function bindEvents() {
+            // Topic accordion
+            elements.topicsList.addEventListener('click', (e) => {
+                const topicHeader = e.target.closest('.topic-header');
+                if (topicHeader) {
+                    const topic = topicHeader.closest('.topic');
+                    const topicId = topic.dataset.topic;
+                    
+                    // Toggle open/close
+                    topic.classList.toggle('open');
+                    
+                    // If clicking a different topic, load its first lesson
+                    if (topicId !== state.currentTopic && !topic.classList.contains('open') === false) {
+                        state.currentTopic = topicId;
+                        state.currentLesson = 0;
+                        loadCurrentLesson();
+                        updateProgressDots();
+                        renderSidebar();
+                        saveState();
+                    }
+                }
+
+                // Lesson click
+                const lessonItem = e.target.closest('.lesson-item');
+                if (lessonItem && !lessonItem.classList.contains('locked')) {
+                    const topicId = lessonItem.dataset.topic;
+                    const lessonIdx = parseInt(lessonItem.dataset.lesson);
+                    
+                    state.currentTopic = topicId;
+                    state.currentLesson = lessonIdx;
+                    loadCurrentLesson();
+                    updateProgressDots();
+                    renderSidebar();
+                    saveState();
+                }
+            });
+
+            // Code editor
+            elements.codeInput.addEventListener('input', updateLineNumbers);
+            elements.codeInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Tab') {
+                    e.preventDefault();
+                    const start = e.target.selectionStart;
+                    const end = e.target.selectionEnd;
+                    e.target.value = e.target.value.substring(0, start) + '  ' + e.target.value.substring(end);
+                    e.target.selectionStart = e.target.selectionEnd = start + 2;
+                    updateLineNumbers();
+                }
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    e.preventDefault();
+                    runCode();
+                }
+            });
+
+            // Buttons
+            document.getElementById('btn-run').addEventListener('click', runCode);
+            document.getElementById('btn-clear').addEventListener('click', clearConsole);
+            document.getElementById('btn-prev').addEventListener('click', prevLesson);
+            document.getElementById('btn-next').addEventListener('click', nextLesson);
+            document.getElementById('btn-hint').addEventListener('click', showHint);
+            document.getElementById('btn-submit').addEventListener('click', submitSolution);
+
+            // Modal
+            document.getElementById('btn-practice').addEventListener('click', () => {
+                elements.modalOverlay.classList.remove('show');
+            });
+            document.getElementById('btn-continue').addEventListener('click', () => {
+                elements.modalOverlay.classList.remove('show');
+                nextLesson();
+            });
+
+            // Mobile tabs
+            document.querySelectorAll('.mobile-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.mobile-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    const isLearn = tab.dataset.tab === 'learn';
+                    document.getElementById('concept-panel').style.display = isLearn ? 'block' : 'none';
+                    document.querySelector('.editor-panel').style.width = isLearn ? '60%' : '100%';
+                });
+            });
+        }
+
+        // ============================================
+        // Code Execution
+        // ============================================
+        function runCode() {
+            clearConsole();
+            const code = elements.codeInput.value;
+
+            if (!code.trim()) {
+                console.error('// No code to run!');
+                return;
+            }
+
+            console.log('// Running...');
+
+            // Create sandbox
+            const logs = [];
+            const mockConsole = {
+                log: (...args) => logs.push({ type: 'log', content: args.join(' ') }),
+                error: (...args) => logs.push({ type: 'error', content: args.join(' ') }),
+                warn: (...args) => logs.push({ type: 'warn', content: args.join(' ') })
+            };
+
+            try {
+                const timeoutId = setTimeout(() => {
+                    throw new Error('Execution timeout! Check for infinite loops.');
+                }, 5000);
+
+                // Execute in sandbox
+                const fn = new Function('console', code);
+                fn(mockConsole);
+
+                clearTimeout(timeoutId);
+
+                // Display logs
+                logs.forEach(log => {
+                    if (log.type === 'error') {
+                        console.error(log.content);
+                    } else {
+                        console.log(log.content);
+                    }
+                });
+
+            } catch (error) {
+                console.error(`Error: ${error.message}`);
+            }
+        }
+
+        function clearConsole() {
+            elements.consoleOutput.innerHTML = '';
+        }
+
+        function consoleLog(message, type = 'log') {
+            const line = document.createElement('div');
+            line.className = `console-line ${type}`;
+            line.textContent = message;
+            elements.consoleOutput.appendChild(line);
+            elements.consoleOutput.scrollTop = elements.consoleOutput.scrollHeight;
+        }
+
+        // ============================================
+        // Navigation
+        // ============================================
+        function prevLesson() {
+            const topic = TOPICS.find(t => t.id === state.currentTopic);
+            if (state.currentLesson > 0) {
+                state.currentLesson--;
+            } else {
+                const topicIdx = TOPICS.findIndex(t => t.id === state.currentTopic);
+                if (topicIdx > 0) {
+                    state.currentTopic = TOPICS[topicIdx - 1].id;
+                    state.currentLesson = TOPICS[topicIdx - 1].lessons.length - 1;
+                }
+            }
+            loadCurrentLesson();
+            updateProgressDots();
+            renderSidebar();
+            saveState();
+        }
+
+        function nextLesson() {
+            const topic = TOPICS.find(t => t.id === state.currentTopic);
+            if (state.currentLesson < topic.lessons.length - 1) {
+                state.currentLesson++;
+            } else {
+                const topicIdx = TOPICS.findIndex(t => t.id === state.currentTopic);
+                if (topicIdx < TOPICS.length - 1) {
+                    state.currentTopic = TOPICS[topicIdx + 1].id;
+                    state.currentLesson = 0;
+                }
+            }
+            loadCurrentLesson();
+            updateProgressDots();
+            renderSidebar();
+            saveState();
+        }
+
+        // ============================================
+        // Hints
+        // ============================================
+        function showHint() {
+            if (state.hintShown) return;
+
+            const topic = TOPICS.find(t => t.id === state.currentTopic);
+            const lesson = topic.lessons[state.currentLesson];
+            
+            if (lesson.hints && lesson.hints.length > 0) {
+                const hint = lesson.hints[0];
+                elements.hintText.innerHTML = `<strong>Hint:</strong> ${hint}`;
+                elements.hintText.classList.add('show');
+                state.hintShown = true;
+                
+                // Deduct XP for hint
+                if (state.xp >= 10) {
+                    state.xp -= 10;
+                    updateStatsDisplay();
+                    saveState();
+                }
+            }
+        }
+
+        // ============================================
+        // Solution Submission
+        // ============================================
+        function submitSolution() {
+            const topic = TOPICS.find(t => t.id === state.currentTopic);
+            const lesson = topic.lessons[state.currentLesson];
+            const code = elements.codeInput.value;
+
+            if (!code.trim()) {
+                showFeedback(false, "Please write some code first!");
+                return;
+            }
+
+            // Test execution
+            const logs = [];
+            const mockConsole = {
+                log: (...args) => logs.push(args.join(' ')),
+                error: (...args) => logs.push('ERROR: ' + args.join(' ')),
+                warn: (...args) => logs.push('WARN: ' + args.join(' '))
+            };
+
+            let hasError = false;
+            try {
+                const fn = new Function('console', code);
+                fn(mockConsole);
+            } catch (error) {
+                hasError = true;
+                showFeedback(false, `There's an error in your code: ${error.message}`);
+                return;
+            }
+
+            // Check test cases if any
+            if (lesson.testCases && lesson.testCases.length > 0) {
+                let allPassed = true;
+                let testResults = [];
+
+                lesson.testCases.forEach(test => {
+                    try {
+                        const fn = new Function(code + '; return ' + test.code);
+                        const result = fn();
+                        const pass = String(result) === test.expected;
+                        allPassed = allPassed && pass;
+                        testResults.push({ test: test.code, expected: test.expected, actual: result, pass });
+                    } catch (e) {
+                        allPassed = false;
+                        testResults.push({ test: test.code, error: e.message });
+                    }
+                });
+
+                if (!allPassed) {
+                    const failedTests = testResults.filter(t => !t.pass);
+                    showFeedback(false, "Some tests didn't pass.", failedTests);
+                    return;
+                }
+            }
+
+            // Success!
+            state.completedLessons[lesson.id] = true;
+            addXP(50);
+            updateStreak();
+            showFeedback(true, "Excellent work! You've completed this lesson.", null, true);
+            updateProgressDots();
+            renderSidebar();
+            saveState();
+        }
+
+        function showFeedback(isCorrect, message, testResults = null, showConfetti = false) {
+            if (isCorrect) {
+                elements.modalIcon.textContent = '✓';
+                elements.modalIcon.className = 'modal-icon success';
+                elements.modalTitle.textContent = 'Correct!';
+                if (showConfetti) {
+                    elements.modalTitle.textContent = '🎉 Amazing!';
+                    createConfetti();
+                }
+            } else {
+                elements.modalIcon.textContent = '✗';
+                elements.modalIcon.className = 'modal-icon error';
+                elements.modalTitle.textContent = 'Not Quite!';
+            }
+
+            elements.modalText.textContent = message;
+
+            if (testResults) {
+                let explanation = '<div class="modal-explanation-title">Test Results:</div><ul>';
+                testResults.forEach(t => {
+                    if (t.error) {
+                        explanation += `<li>${t.test}: Error - ${t.error}</li>`;
+                    } else {
+                        explanation += `<li>${t.test}: Expected "${t.expected}", got "${t.actual}"</li>`;
+                    }
+                });
+                explanation += '</ul>';
+                elements.modalExplanation.innerHTML = explanation;
+                elements.modalExplanation.style.display = 'block';
+            } else {
+                elements.modalExplanation.style.display = 'none';
+            }
+
+            elements.modalOverlay.classList.add('show');
+        }
+
+        // ============================================
+        // Effects
+        // ============================================
+        function showToast(icon, title, subtitle) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <span class="toast-icon">${icon}</span>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-subtitle">${subtitle}</div>
+                </div>
+            `;
+            elements.toastContainer.appendChild(toast);
+
+            setTimeout(() => toast.classList.add('show'), 10);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        function createConfetti() {
+            const colors = ['#58A6FF', '#7EE787', '#F0883E', '#F85149', '#A371F7'];
+            
+            for (let i = 0; i < 50; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                piece.style.left = Math.random() * 100 + '%';
+                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.animationDelay = Math.random() * 0.5 + 's';
+                piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+                elements.confetti.appendChild(piece);
+            }
+
+            setTimeout(() => {
+                elements.confetti.innerHTML = '';
+            }, 4000);
+        }
+
+        // ============================================
+        // Start the app
+        // ============================================
+        init();
+    </script>
+</body>
+</html>
