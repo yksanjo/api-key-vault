@@ -1,0 +1,98 @@
+# Plugin Configuration
+# This file configures global plugin settings
+
+plugins:
+  # Code Generators
+  python_generator:
+    enabled: true
+    config:
+      use_type_hints: true
+  
+  javascript_generator:
+    enabled: true
+    config:
+      use_typescript: false
+      use_esm: true
+  
+  rust_generator:
+    enabled: true
+  
+  go_generator:
+    enabled: true
+
+  # Data Processors
+  csv_processor:
+    enabled: true
+    config:
+      delimiter: ","
+      encoding: "utf-8"
+  
+  json_transformer:
+    enabled: true
+    config:
+      indent: 2
+  
+  xml_parser:
+    enabled: true
+  
+  yaml_handler:
+    enabled: true
+
+  # External Services (require configuration)
+  github_integration:
+    enabled: true
+    config:
+      # Token loaded from GITHUB_TOKEN env var
+      username: ""
+  
+  slack_notifier:
+    enabled: false
+    # Webhook URL loaded from SLACK_WEBHOOK env var
+  
+  email_sender:
+    enabled: false
+  
+  webhook_caller:
+    enabled: true
+    config:
+      default_timeout: 30
+
+  # Testing
+  unit_test_generator:
+    enabled: true
+    config:
+      framework: "pytest"
+  
+  code_linter:
+    enabled: true
+    config:
+      language: "python"
+  
+  security_scanner:
+    enabled: true
+
+  # Documentation
+  readme_generator:
+    enabled: true
+  
+  api_docs:
+    enabled: true
+  
+  docstring_writer:
+    enabled: true
+    config:
+      style: "google"
+
+  # Utilities
+  file_watcher:
+    enabled: true
+    config:
+      poll_interval: 1
+  
+  git_helper:
+    enabled: true
+  
+  docker_manager:
+    enabled: true
+    config:
+      default_timeout: 60

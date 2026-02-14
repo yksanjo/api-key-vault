@@ -1,164 +1,41 @@
-# Cursor Agent runtime files
-.cursor_agent.log
-.cursor_agent.pid
+# Dependencies
+node_modules/
+packages/*/node_modules/
 
-# Python
-*.pyc
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-
-# Logs
-*.log
-*.log.*
-
-# OS
-.DS_Store
-Thumbs.db
-.CFUserTextEncoding
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-*~
 
-# Virtual environments
-venv/
-env/
-ENV/
-myenv/
-tf_env/
+# OS
+.DS_Store
+Thumbs.db
 
-# Credentials & Secrets (NEVER commit these)
+# DevKB data
+.devkb/
+.devkb.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
 .env
-.env.*
-!.env.example
-*credentials*.json
-*secrets*.json
-.npmrc
-*.pem
-*.key
-.claude.json
-.claude.json.backup.*
-.clawdbot/
-.openclaw/
-.zsh_history
-.bash_history
-.python_history
-.viminfo
+.env.local
+.env.*.local
 
-# Runtime files
-*.pid
-.agent.pid
-.sim.pid
-.wrangler.pid
+# Test coverage
+coverage/
+.nyc_output/
 
-# Media & Screenshots (noise)
-*.wav
-*.aif
-*.png
-*.jpg
-*.jpeg
-Desktop*.wav
-Desktop*.aif
-discovery_page*.png
-login_*.png
-homepage_*.png
-company_page*.png
-page_debug.png
-test_*.png
-moltbook_claim_page*.png
-
-# Cache & Temp
-.cache/
-.config/
-.local/
-.npm/
-.conda/
-.expo/
-.vercel/
-.railway/
-.trae/
-.trae-aicc/
-.qwen/
-.kimi/
-.gemini/
-.cursor/
-.deepseek-code/
-.cagent/
-.agent-tars/
-.bun/
-.colima/
-.cups/
-.dropbox/
-.ollama/
-.oracle_jre_usage/
-.plcc-helper/
-.swiftpm/
-.matplotlib/
-.icube-remote-ssh/
-.geomapapp-home/
-.ssh/
-.Trash/
-
-# Session & History
-.zsh_sessions/
-.zcompdump
-
-# Data files (large/scraped)
-*.csv
-!requirements*.txt
-*.json
-!package*.json
-!tsconfig*.json
-scraper_state*.json
-*.json.completed
-*.json.backup
-emergency_backup_*.json
-github_fork_*.json
-github_repos_*.json
-cleanup_report.json
-*_results.json
-feud_strategy.json
-social_media_*.json
-portfolio_summary.json
-promotion_*.json
-crunchbase_results.json
-
-# Large binary/data
-get-pip.py
-
-# Backup folders
-.kimi-backup-*/
-
-# Output files
-READY_TO_SEND_EMAILS.txt
-extracted_usernames.txt
-PUSH_INSTRUCTIONS.txt
-X_POST_*.txt
-
-# Specific app folders
-Applications/
-Documents/
-Downloads/
-Movies/
-Music/
-Pictures/
-Public/
-Library/
-Desktop/
-"Qwen Projects"/
-"VS code"/
-
-# Project specific noise (keep structure, ignore outputs)
-archive/
-docs/
-memes/
-scripts/
-
-# Keep these even though they're json
-!agent.config.json
+# Temporary files
+*.tmp
+*.temp
+*.pyc
+__pycache__/

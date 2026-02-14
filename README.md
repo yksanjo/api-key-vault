@@ -1,224 +1,195 @@
-# GitHub Fork Mapper for Open Claw Project
+# Multi-Agent Plugins
 
-## 🎯 Project Overview
+Plugin system for extending Multi-Agent Orchestrator
 
-This project maps all GitHub users who have forked from the [openclaw/openclaw](https://github.com/openclaw/openclaw) repository and analyzes their AI/agent-related activities. The goal is to identify and track the community of developers interested in AI agents through their Open Claw forks.
+![Plugins](https://img.shields.io/badge/Plugins-Extensible-blue)
+![Python](https://img.shields.io/badge/Python-3.8%2B-green)
 
-## 📊 Current Status
+## Features
 
-**Repository Stats (as of test):**
-- **Repository**: openclaw/openclaw
-- **Stars**: 171,410 ⭐
-- **Forks**: 27,639 🍴
-- **Description**: "Your own personal AI assistant. Any OS. Any Platform. The lobster way. 🦞"
+- 🔌 **Plugin Architecture**: Easy to add new capabilities
+- 📦 **Pre-built Plugins**: 20+ ready-to-use plugins
+- 🎯 **Type-safe**: Strong typing with Pydantic
+- 🔄 **Hot Reload**: Load plugins without restart
+- 📝 **Auto-discovery**: Plugins discovered automatically
+- 🛠️ **Developer-friendly**: Simple plugin API
 
-**API Status**: ✅ Working
-**Rate Limits**: 60 requests/hour (57 remaining)
+## Available Plugins
 
-## 🚀 Getting Started
+### Code Generation
+- `python_generator` - Generate Python code
+- `javascript_generator` - Generate JavaScript/TypeScript
+- `rust_generator` - Generate Rust code
+- `go_generator` - Generate Go code
 
-### Prerequisites
-- Python 3.7+
-- `requests` library (install via `pip install requests`)
+### Data Processing
+- `csv_processor` - Process CSV files
+- `json_transformer` - Transform JSON data
+- `xml_parser` - Parse and manipulate XML
+- `yaml_handler` - Work with YAML files
 
-### Installation
+### External Services
+- `github_integration` - GitHub API integration
+- `slack_notifier` - Send Slack notifications
+- `email_sender` - Send emails
+- `webhook_caller` - Call webhooks
+
+### Testing
+- `unit_test_generator` - Generate unit tests
+- `code_linter` - Lint code
+- `security_scanner` - Scan for vulnerabilities
+
+### Documentation
+- `readme_generator` - Generate README files
+- `api_docs` - Generate API documentation
+- `docstring_writer` - Add docstrings to code
+
+### Utilities
+- `file_watcher` - Watch file changes
+- `git_helper` - Git operations
+- `docker_manager` - Manage Docker containers
+
+## Install
+
 ```bash
-# Clone or download the project files
-# Install required packages
-pip install requests
+pip install -r requirements.txt
 ```
 
-### Quick Start
-1. **Test API access:**
-   ```bash
-   python test_github_scraper.py
-   ```
+## Quick Start
 
-2. **Run full scraping:**
-   ```bash
-   python github_fork_scraper.py
-   ```
+### Use a Plugin
 
-3. **Optional**: Enter a GitHub token when prompted for higher rate limits
-
-## 📁 Project Structure
-
-```
-.
-├── github_fork_scraper.py    # Main scraping and analysis script
-├── test_github_scraper.py    # API test and verification script
-├── README.md                 # This documentation
-└── (Generated files during execution):
-    ├── progress_*.json       # Progress saves
-    ├── github_fork_analysis_*.json  # Full results (JSON)
-    ├── github_fork_analysis_*.csv   # Full results (CSV)
-    └── github_fork_summary_*.json   # Analysis summary
-```
-
-## 🔧 Features
-
-### 1. **Fork Discovery**
-- Fetches all forks from openclaw/openclaw repository
-- Handles pagination automatically
-- Respects GitHub rate limits
-
-### 2. **User Analysis**
-- Collects user profile information
-- Analyzes for AI/agent keywords in:
-  - User bio
-  - User name
-  - Repository names and descriptions
-- Identifies agent-related developers
-
-### 3. **Keyword Detection**
-The system looks for these AI/agent-related keywords:
-- `agent`, `ai`, `llm`, `gpt`, `claude`, `openai`, `anthropic`
-- `autonomous`, `assistant`, `bot`, `automation`, `workflow`
-- `orchestration`, `multi-agent`, `swarm`, `crew`, `autogen`
-- `langchain`, `llamaindex`, `haystack`, `semantic-kernel`
-- `claw`, `openclaw`, `agentic`, `reasoning`, `cognitive`
-
-### 4. **Data Export**
-- **JSON**: Full structured data
-- **CSV**: Tabular data for spreadsheets
-- **Progress saves**: Automatic checkpointing
-- **Summary reports**: Key metrics and insights
-
-## 📈 Expected Output
-
-The scraper will generate:
-1. **User Profiles**: Login, name, company, location, bio, etc.
-2. **Fork Information**: When they forked, fork URL
-3. **Agent Analysis**: Whether user is agent-related, keywords found
-4. **Statistics**: Total users, agent percentage, top keywords
-5. **Sample Data**: First 10 agent users with details
-
-## ⚡ Performance Notes
-
-### Rate Limits
-- **Without token**: 60 requests/hour (1 request/second recommended)
-- **With token**: 5,000 requests/hour
-
-### Estimated Time
-- **27,639 forks** to analyze
-- **~1 request/second** = ~7.7 hours without token
-- **Progress saves** every 5 users
-- **Resume capability** from progress files
-
-## 🔐 GitHub Token (Optional but Recommended)
-
-Get a token from: https://github.com/settings/tokens
-
-**Permissions needed:**
-- `public_repo` (read-only)
-- Or no special permissions for public data
-
-**Benefits:**
-- Higher rate limits (5,000 vs 60 requests/hour)
-- More reliable access
-- Faster scraping
-
-## 🎮 Usage Examples
-
-### Basic Usage
-```bash
-python github_fork_scraper.py
-```
-
-### With GitHub Token
-```bash
-# The script will prompt for token, or you can modify the code
-```
-
-### Monitor Progress
-```bash
-# Check generated files
-ls -la progress_*.json
-ls -la github_fork_analysis_*.json
-```
-
-### Resume from Progress
 ```python
-# The script automatically saves progress
-# If interrupted, you can modify the script to load from progress files
+from plugins import PluginManager
+
+# Initialize plugin manager
+manager = PluginManager()
+
+# Load a plugin
+python_gen = manager.register(
+    'plugins.generators.python_generator.PythonGenerator'
+)
+
+# Use the plugin
+result = python_gen.execute(
+    type="flask_api",
+    endpoints=[
+        {"path": "/users", "method": "GET"},
+        {"path": "/users", "method": "POST"},
+    ]
+)
+
+print(result['code'])
 ```
 
-## 📊 Analysis Goals
+### Create Custom Plugin
 
-1. **Community Mapping**: Who are the Open Claw forkers?
-2. **Agent Ecosystem**: What percentage are AI/agent developers?
-3. **Trend Analysis**: When did people fork? (temporal patterns)
-4. **Network Effects**: Can we identify clusters or communities?
-5. **Outreach Targets**: Identify potential collaborators or users
+```python
+from plugins.base import BasePlugin, BasePluginConfig
+from pydantic import Field
 
-## 🛠️ Technical Details
+class MyPluginConfig(BasePluginConfig):
+    """Plugin configuration"""
+    api_key: str = Field(..., description="API key")
 
-### API Endpoints Used
-- `GET /repos/openclaw/openclaw` - Repository info
-- `GET /repos/openclaw/openclaw/forks` - Fork list
-- `GET /users/{username}` - User details
-- `GET /users/{username}/repos` - User repositories
-- `GET /rate_limit` - Rate limit status
+class MyPlugin(BasePlugin):
+    """My custom plugin"""
+    
+    name = "my_plugin"
+    version = "1.0.0"
+    description = "What this plugin does"
+    config_class = MyPluginConfig
+    
+    def execute(self, **kwargs):
+        """Execute plugin logic"""
+        return {"status": "success"}
 
-### Error Handling
-- Rate limit detection and automatic waiting
-- Connection retries
-- Invalid user handling
-- Progress saving on errors
+# Register plugin
+manager.register(MyPlugin())
+```
 
-### Data Privacy
-- Only collects public GitHub data
-- No authentication required for basic usage
-- Respects GitHub's Terms of Service
+## Plugin Development
 
-## 🔮 Future Enhancements
+### Plugin Structure
 
-### Planned Features
-1. **Social Network Analysis**: Map connections between forkers
-2. **Activity Tracking**: Monitor recent commits and activity
-3. **Repository Analysis**: Deep dive into forked repositories
-4. **Trend Visualization**: Charts and graphs of findings
-5. **Real-time Updates**: Periodic re-scraping for new forks
+```python
+from plugins.base import BasePlugin
+from pydantic import BaseModel, Field
 
-### Integration Possibilities
-1. **OpenCLaw Integration**: Direct integration with OpenCLaw system
-2. **Database Backend**: Store results in SQLite/PostgreSQL
-3. **Web Dashboard**: Real-time monitoring interface
-4. **API Service**: REST API for querying results
-5. **Alert System**: Notifications for new agent-related forks
+class MyPluginConfig(BaseModel):
+    """Plugin configuration"""
+    api_key: str = Field(..., description="API key")
 
-## 🤝 Contributing
+class MyPlugin(BasePlugin):
+    """Description of what the plugin does"""
+    
+    # Metadata
+    name = "my_plugin"
+    version = "1.0.0"
+    author = "Your Name"
+    description = "What this plugin does"
+    
+    # Configuration
+    config_class = MyPluginConfig
+    
+    def __init__(self, config: MyPluginConfig = None):
+        super().__init__(config)
+    
+    def execute(self, **kwargs):
+        """Main plugin logic"""
+        return {"result": "success"}
+    
+    def validate(self):
+        """Validate plugin can run"""
+        return True
+```
 
-This is an open project for mapping the Open Claw community. Contributions welcome!
+### Plugin Lifecycle
 
-### Areas for Contribution
-- Performance optimization
-- Additional analysis features
-- Visualization tools
-- Documentation improvements
-- Error handling enhancements
+```
+┌─────────────┐
+│   Created   │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│  Validated  │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│  Registered │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│  Executed   │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│   Cleaned   │
+└─────────────┘
+```
 
-## 📄 License
+## Examples
 
-MIT License - See included LICENSE file (if any)
+See the `examples/` directory for more examples.
 
-## ⚠️ Disclaimer
+## Testing
 
-This tool:
-- Only accesses public GitHub data
-- Respects rate limits and Terms of Service
-- Is for research and community analysis purposes
-- Should not be used for spam or harassment
+```bash
+pytest tests/test_plugins.py -v
+```
 
-## 📞 Support
+## Configuration
 
-For issues or questions:
-1. Check the GitHub API status: https://www.githubstatus.com/
-2. Review rate limit documentation
-3. Test with the verification script first
+Edit `plugins.yaml` to enable/disable plugins and configure their settings.
 
----
+## License
 
-**Happy Fork Mapping!** 🦞🔍
+MIT
 
-*"Tracking the lobster way through GitHub forks"*
+## Links
+
+- [Parent Project](https://github.com/yksanjo/multi-agent-orchestrator)
