@@ -1,0 +1,24 @@
+{
+  "name": "api-key-vault",
+  "version": "1.0.0",
+  "description": "Secure, auditable storage for API keys with automatic rotation and usage monitoring",
+  "main": "src/index.js",
+  "bin": {
+    "keyvault": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "jest"
+  },
+  "keywords": ["api", "key", "vault", "security", "rotation", "audit"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "aes-js": "^3.1.2",
+    "commander": "^11.1.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
