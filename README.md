@@ -1,195 +1,114 @@
-# Multi-Agent Plugins
+# GitHub Organization Cleanup & Organization
 
-Plugin system for extending Multi-Agent Orchestrator
+This repository contains tools and documentation for organizing the `yksanjo` GitHub organization.
 
-![Plugins](https://img.shields.io/badge/Plugins-Extensible-blue)
-![Python](https://img.shields.io/badge/Python-3.8%2B-green)
+## Current Status
 
-## Features
+**500 repositories** → **Target: 20-30 high-quality repositories**
 
-- 🔌 **Plugin Architecture**: Easy to add new capabilities
-- 📦 **Pre-built Plugins**: 20+ ready-to-use plugins
-- 🎯 **Type-safe**: Strong typing with Pydantic
-- 🔄 **Hot Reload**: Load plugins without restart
-- 📝 **Auto-discovery**: Plugins discovered automatically
-- 🛠️ **Developer-friendly**: Simple plugin API
+### Analysis Results:
+- **500 total repositories** on GitHub
+- **23 templates/forks** (immediate deletion)
+- **65 tools/utilities** (review before deletion)
+- **104 projects/agents/AI** (consider keeping)
+- **308 other repositories** (manual review needed)
 
-## Available Plugins
+## Cleanup Plan
 
-### Code Generation
-- `python_generator` - Generate Python code
-- `javascript_generator` - Generate JavaScript/TypeScript
-- `rust_generator` - Generate Rust code
-- `go_generator` - Generate Go code
+### Phase 1: Immediate Deletions (Week 1)
+- Delete 23 templates and forks
+- Target: Reduce from 500 to 200 repositories
 
-### Data Processing
-- `csv_processor` - Process CSV files
-- `json_transformer` - Transform JSON data
-- `xml_parser` - Parse and manipulate XML
-- `yaml_handler` - Work with YAML files
+### Phase 2: Selective Cleanup (Week 2)
+- Review and select best 20-30 repositories
+- Delete remaining 400+ repositories
+- Target: Reduce from 200 to 30 repositories
 
-### External Services
-- `github_integration` - GitHub API integration
-- `slack_notifier` - Send Slack notifications
-- `email_sender` - Send emails
-- `webhook_caller` - Call webhooks
+### Phase 3: Polish & Document (Week 3)
+- Polish READMEs for all kept repositories
+- Add screenshots and deployment information
+- Ensure proper documentation
 
-### Testing
-- `unit_test_generator` - Generate unit tests
-- `code_linter` - Lint code
-- `security_scanner` - Scan for vulnerabilities
+### Phase 4: Profile Creation (Week 4)
+- Create GitHub profile repository
+- Pin 6 best projects
+- Update LinkedIn and establish narrative
 
-### Documentation
-- `readme_generator` - Generate README files
-- `api_docs` - Generate API documentation
-- `docstring_writer` - Add docstrings to code
+## Core Projects to Keep (Based on Commit Analysis)
 
-### Utilities
-- `file_watcher` - Watch file changes
-- `git_helper` - Git operations
-- `docker_manager` - Manage Docker containers
+These 20 projects have **real commits** and are **original work**:
 
-## Install
+1. **signal-based-recruitment** (22 commits) - Recruitment platform
+2. **agentchat** (13 commits) - Real-time agent chat (DEPLOYED)
+3. **coding-tutor-v2** (18 commits) - Educational platform
+4. **multi-agent-plugins** (18 commits) - Agent plugin system
+5. **Strudel-music-pattern-memory-bank** (15 commits) - Music pattern library
+6. **coding-tutor** (15 commits) - Original coding tutor
+7. **beat-sensei** (15 commits) - Music education with AI
+8. **linkedin-face-crm** (11 commits) - Face recognition CRM
+9. **github-repo-agent** (11 commits) - GitHub automation
+10. **deepseek-code-server** (13 commits) - Code server
+11. **agent-gym** (12 commits) - Agent training environment
+12. **signalfox** (10 commits) - Signal-based tools
+13. **contextual-workspace** (10 commits) - Context-aware workspace
+14. **agent-highway** (10 commits) - Agent infrastructure
+15. **cli-manager-mcp** (9 commits) - CLI management
+16. **vc-intelligence-mcp** (8 commits) - VC intelligence
+17. **next-100-days** (8 commits) - Progress tracking
+18. **snow-globe-app** (14 commits) - Interactive app
+19. **complianceos-mvp** (26 commits) - Compliance management
+20. **moltworker** (23 commits) - Cloudflare agent runtime
 
-```bash
-pip install -r requirements.txt
-```
+**Note:** `ddsp-piano` has 44 commits but is a FORK - consider deleting.
 
-## Quick Start
+## Tools
 
-### Use a Plugin
-
-```python
-from plugins import PluginManager
-
-# Initialize plugin manager
-manager = PluginManager()
-
-# Load a plugin
-python_gen = manager.register(
-    'plugins.generators.python_generator.PythonGenerator'
-)
-
-# Use the plugin
-result = python_gen.execute(
-    type="flask_api",
-    endpoints=[
-        {"path": "/users", "method": "GET"},
-        {"path": "/users", "method": "POST"},
-    ]
-)
-
-print(result['code'])
-```
-
-### Create Custom Plugin
-
-```python
-from plugins.base import BasePlugin, BasePluginConfig
-from pydantic import Field
-
-class MyPluginConfig(BasePluginConfig):
-    """Plugin configuration"""
-    api_key: str = Field(..., description="API key")
-
-class MyPlugin(BasePlugin):
-    """My custom plugin"""
-    
-    name = "my_plugin"
-    version = "1.0.0"
-    description = "What this plugin does"
-    config_class = MyPluginConfig
-    
-    def execute(self, **kwargs):
-        """Execute plugin logic"""
-        return {"status": "success"}
-
-# Register plugin
-manager.register(MyPlugin())
-```
-
-## Plugin Development
-
-### Plugin Structure
-
-```python
-from plugins.base import BasePlugin
-from pydantic import BaseModel, Field
-
-class MyPluginConfig(BaseModel):
-    """Plugin configuration"""
-    api_key: str = Field(..., description="API key")
-
-class MyPlugin(BasePlugin):
-    """Description of what the plugin does"""
-    
-    # Metadata
-    name = "my_plugin"
-    version = "1.0.0"
-    author = "Your Name"
-    description = "What this plugin does"
-    
-    # Configuration
-    config_class = MyPluginConfig
-    
-    def __init__(self, config: MyPluginConfig = None):
-        super().__init__(config)
-    
-    def execute(self, **kwargs):
-        """Main plugin logic"""
-        return {"result": "success"}
-    
-    def validate(self):
-        """Validate plugin can run"""
-        return True
-```
-
-### Plugin Lifecycle
-
-```
-┌─────────────┐
-│   Created   │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│  Validated  │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│  Registered │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│  Executed   │
-└──────┬──────┘
-       │
-       ▼
-┌─────────────┐
-│   Cleaned   │
-└─────────────┘
-```
-
-## Examples
-
-See the `examples/` directory for more examples.
-
-## Testing
+### `delete_repos.sh`
+Script to delete GitHub repositories from a list.
 
 ```bash
-pytest tests/test_plugins.py -v
+# Delete high priority templates and forks
+./delete_repos.sh delete_high_priority.txt
+
+# Review medium priority deletions
+cat delete_medium_priority.txt
 ```
 
-## Configuration
+### Analysis Scripts
+- `analyze_commit_history.sh` - Analyze commit history of repositories
+- `categorize_repos.py` - Categorize repositories for cleanup
+- `generate_delete_lists.sh` - Generate delete lists
 
-Edit `plugins.yaml` to enable/disable plugins and configure their settings.
+### Repository Lists
+- `delete_high_priority.txt` - 23 templates/forks (immediate deletion)
+- `delete_medium_priority.txt` - 65 tools/utilities (review)
+- `keep_recommended.txt` - 104 projects/agents/AI (consider keeping)
+
+## Documentation
+
+- `FINAL_CLEANUP_PLAN.md` - Complete cleanup plan based on analysis
+- `FINAL_ACTION_PLAN.md` - Original cleanup plan
+- `PROFILE_README.md` - GitHub profile README template
+- `PROJECT_INDEX.md` - Index of all active projects
+
+## Immediate Next Steps
+
+1. **Delete templates and forks:**
+   ```bash
+   ./delete_repos.sh delete_high_priority.txt
+   ```
+
+2. **Review remaining repositories:**
+   ```bash
+   gh repo list yksanjo --limit 50
+   ```
+
+3. **Begin polishing top projects:**
+   ```bash
+   cd signal-based-recruitment
+   # Update README, add screenshots, etc.
+   ```
 
 ## License
 
 MIT
-
-## Links
-
-- [Parent Project](https://github.com/yksanjo/multi-agent-orchestrator)
