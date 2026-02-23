@@ -1,5 +1,12 @@
 # api-key-vault
 
+Production-grade project scaffold focused on reliability, maintainability, and fast onboarding.
+
+[![CI](https://img.shields.io/github/actions/workflow/status/yksanjo/api-key-vault/ci.yml?branch=main&label=ci)](https://github.com/yksanjo/api-key-vault/actions)
+![License](https://img.shields.io/github/license/yksanjo/api-key-vault)
+![Last Commit](https://img.shields.io/github/last-commit/yksanjo/api-key-vault)
+![Repo Size](https://img.shields.io/github/repo-size/yksanjo/api-key-vault)
+
 ## Detailed Description
 
 api-key-vault is maintained as an industry-grade software project with production-ready engineering practices.  
